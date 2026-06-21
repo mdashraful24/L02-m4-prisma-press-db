@@ -16,11 +16,12 @@ const registerUser: TypeController = async (req, res) => {
         });
     } catch (error) {
         const err = errorHandle(error);
-        
+
         sendResponse(res, {
-            statusCode: httpStatus.BAD_REQUEST,
+            statusCode: err.statusCode || httpStatus.INTERNAL_SERVER_ERROR,
             success: false,
             message: err.message,
+            // error: err,
         });
     }
 }
