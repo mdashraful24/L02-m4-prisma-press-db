@@ -1,0 +1,13 @@
+// * Enumerations for user.prisma model
+enum ActiveStatus {
+    ACTIVE
+    BLOCKED
+}
+
+enum Role {
+    USER
+    AUTHOR
+    ADMIN
+}
+
+// * 
