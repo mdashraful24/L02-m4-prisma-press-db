@@ -1,10 +1,10 @@
 import httpStatus from 'http-status';
-import { NextFunction, Request, RequestHandler, Response } from "express";
+import { RequestHandler } from "express";
 import { sendResponse } from './sendResponse';
 import { errorHandle } from './errorResponse';
 
-export const catchAsync = (fn: RequestHandler) => {
-    return async (req: Request, res: Response, next: NextFunction) => {
+export const catchAsync = (fn: RequestHandler): RequestHandler => {
+    return async (req, res, next) => {
         try {
             await fn(req, res, next);
         } catch (error) {
@@ -17,5 +17,5 @@ export const catchAsync = (fn: RequestHandler) => {
                 // error: err,
             });
         }
-    }
+    };
 };

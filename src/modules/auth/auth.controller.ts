@@ -1,11 +1,9 @@
 import httpStatus from 'http-status';
-import { TTypeController } from '../../types/express.types';
 import { catchAsync } from '../../utils/catchAsync';
 import { authService } from "./auth.service";
 import { sendResponse } from "../../utils/sendResponse";
 
-const loginUser: TTypeController = catchAsync(async (req, res, next) => {
-    
+const loginUser = catchAsync(async (req, res) => {
     const result = await authService.loginUserIntoDB(req.body);
 
     sendResponse(res, {
