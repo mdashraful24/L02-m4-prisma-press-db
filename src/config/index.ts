@@ -6,19 +6,19 @@ dotenv.config({
 });
 
 const config ={
-    databaseUrl: process.env.DATABASE_URL as string,
-    port: process.env.PORT as string,
-    appUrl: process.env.APP_URL as string,
+    databaseUrl: process.env.DATABASE_URL,
+    port: process.env.PORT,
+    appUrl: process.env.APP_URL,
 
     security: {
-        bcryptSaltRounds: process.env.BCRYPT_SALT_ROUNDS as string,
+        bcryptSaltRounds: process.env.BCRYPT_SALT_ROUNDS,
     },
 
     jwt: {
-        accessSecret: process.env.JWT_ACCESS_SECRET as string,
-        refreshSecret: process.env.JWT_REFRESH_SECRET as string,
-        accessExpiresIn: process.env.JWT_ACCESS_EXPIRES_IN as string,
-        refreshExpiresIn: process.env.JWT_REFRESH_EXPIRES_IN as string,
+        accessSecret: process.env.JWT_ACCESS_SECRET!,
+        refreshSecret: process.env.JWT_REFRESH_SECRET!,
+        accessExpiresIn: process.env.JWT_ACCESS_EXPIRES_IN!,
+        refreshExpiresIn: process.env.JWT_REFRESH_EXPIRES_IN!,
     },
 };
 

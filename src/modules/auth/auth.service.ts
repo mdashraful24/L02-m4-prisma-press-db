@@ -1,66 +1,52 @@
 import httpStatus from 'http-status';
+import jwt, { SignOptions } from "jsonwebtoken";
+import bcrypt from 'bcryptjs';
 import { prisma } from "../../lib/prisma";
 import { SelfError } from "../../utils/errorResponse";
-import { IUser } from "../user/user.interface";
-import bcrypt from 'bcryptjs';
-import jwt from "jsonwebtoken";
+import { ILoginUser } from './auth.interface';
 import config from '../../config';
+import { jwtUtils } from '../../utils/jwt';
 
-const loginUserIntoDB = async (payload: IUser) => {
+const loginUserIntoDB = async (payload: ILoginUser) => {
     const { email, password } = payload;
 
-    const findUser = await prisma.user.findUnique({
+    const user = await prisma.user.findUniqueOrThrow({
         where: { email }
     });
 
-    if (!findUser) {
-        throw new SelfError("User does not exist!", httpStatus.NOT_FOUND);
-    }
-
-    const matchPassword = await bcrypt.compare(
+    const isPasswordMatched = await bcrypt.compare(
         password,
-        findUser.password
+        user.password
     )
 
-    if (!matchPassword) {
+    if (!isPasswordMatched) {
         throw new SelfError("Incorrect password!", httpStatus.UNAUTHORIZED);
     }
 
-    const user = await prisma.user.findUnique({
-        where: { email },
-        omit: { password: true }
-    });
-
     const jwtPayload = {
-        id: findUser.id,
-        name: findUser.name,
-        email: findUser.email,
-        role: findUser.role
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role
     };
 
-    const accessToken = jwt.sign(
+    const accessToken = jwtUtils.createToken(
         jwtPayload,
         config.jwt.accessSecret,
-        {
-            expiresIn: "1d"
-        }
+        config.jwt.accessExpiresIn as SignOptions
     );
 
-    const refreshToken = jwt.sign(
+    const refreshToken = jwtUtils.createToken(
         jwtPayload,
         config.jwt.refreshSecret,
-        {
-            expiresIn: "30d"
-        }
+        config.jwt.refreshExpiresIn as SignOptions
     );
 
-    return {
-        accessToken,
-        refreshToken
-    }
-}
+    return { accessToken, refreshToken };
+};
+
 
 export const authService = {
     loginUserIntoDB,
 
-}
+};
