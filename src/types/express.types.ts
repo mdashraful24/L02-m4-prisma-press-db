@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 
-export type TypeController = (
+export type TTypeController = (
     req: Request,
     res: Response,
     next: NextFunction
