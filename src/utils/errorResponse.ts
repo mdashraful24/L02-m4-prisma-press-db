@@ -4,9 +4,9 @@ type TErrorHandleType = {
 };
 
 export class SelfError extends Error {
-    statusCode: number
+    statusCode?: number
 
-    constructor(message: string, statusCode: number) {
+    constructor(message: string, statusCode?: number) {
         super(message)
         this.statusCode = statusCode
     }
@@ -16,7 +16,7 @@ export const errorHandle = (error: unknown): TErrorHandleType => {
     if (error instanceof SelfError) {
         return {
             message: error.message,
-            statusCode: error.statusCode,
+            statusCode: error.statusCode ?? 500,
         }
     }
 
