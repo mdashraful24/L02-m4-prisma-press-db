@@ -1,5 +1,5 @@
 import httpStatus from 'http-status';
-import jwt, { SignOptions } from "jsonwebtoken";
+import { SignOptions } from "jsonwebtoken";
 import bcrypt from 'bcryptjs';
 import { prisma } from "../../lib/prisma";
 import { SelfError } from "../../utils/errorResponse";
@@ -13,6 +13,10 @@ const loginUserIntoDB = async (payload: ILoginUser) => {
     const user = await prisma.user.findUniqueOrThrow({
         where: { email }
     });
+
+    if (user.activeStatus === "BLOCKED") {
+        throw new SelfError("Your account has been blocked. Please contact support.", httpStatus.FORBIDDEN);
+    }
 
     const isPasswordMatched = await bcrypt.compare(
         password,

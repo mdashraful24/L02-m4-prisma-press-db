@@ -5,6 +5,7 @@ import config from "./config";
 import { sendResponse } from "./utils/sendResponse";
 import { userRouter } from "./modules/user/user.route";
 import { authRouter } from "./modules/auth/auth.route";
+import globalErrorHandler from "./middleware/globalErrorHandler";
 
 const app: Application = express();
 
@@ -31,5 +32,8 @@ app.get("/", (req: Request, res: Response) => {
 
 app.use("/api/users", userRouter);
 app.use("/api/auth", authRouter);
+
+// Global Error Handling Middleware
+app.use(globalErrorHandler);
 
 export default app;

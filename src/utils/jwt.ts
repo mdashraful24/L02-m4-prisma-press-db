@@ -1,9 +1,7 @@
 import httpStatus from 'http-status';
 import jwt, { JwtPayload, SignOptions } from "jsonwebtoken"
-import { SelfError } from "./errorResponse";
 
 const createToken = (payload: JwtPayload, secret: string, expiresIn: SignOptions) => {
-
     const token = jwt.sign(
         payload,
         secret,
@@ -15,14 +13,21 @@ const createToken = (payload: JwtPayload, secret: string, expiresIn: SignOptions
     return token;
 };
 
-const verifyToken = (token: string, secret: string) =>{
+const verifyToken = (token: string, secret: string) => {
     try {
         const verifiedToken = jwt.verify(token, secret);
-        return verifiedToken;
-    } catch (error) {
-        throw new SelfError("Invalid signature", httpStatus.UNAUTHORIZED);
+        return {
+            success: true,
+            data: verifiedToken
+        };
+    } catch (error: any) {
+        return {
+            statusCode: httpStatus.UNAUTHORIZED,
+            success: false,
+            error: error.message
+        }
     }
-}
+};
 
 
 export const jwtUtils = {
