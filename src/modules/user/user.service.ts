@@ -34,14 +34,6 @@ const registerUserIntoDB = async (payload: IUser) => {
         }
     });
 
-    // await prisma.profile.create({
-    //     data: {
-    //         userId: createdUser.id,
-    //         profilePhoto,
-    //         bio
-    //     }
-    // });
-
     const user = await prisma.user.findUnique({
         where: {
             id: createdUser.id,
@@ -62,11 +54,36 @@ const getMyProfileIntoDB = async (userId: string) => {
     });
 
     return user;
-}
+};
+
+const updateMyProfileIntoDB = async (userId: string, payload: IUser) => {
+    const { name, email, password, profilePhoto, bio } = payload;
+
+    const hashedPassword = await bcrypt.hash(password, Number(config.security.bcryptSaltRounds));
+
+    const updatedUser = await prisma.user.update({
+        where: { id: userId },
+        data: {
+            name,
+            email,
+            password: hashedPassword,
+            profile: {
+                update: {
+                    profilePhoto, bio
+                }
+            }
+        },
+        omit: { password: true },
+        include: { profile: true }
+    });
+
+    return updatedUser;
+};
 
 
 export const userService = {
     registerUserIntoDB,
     getMyProfileIntoDB,
+    updateMyProfileIntoDB,
 
 };
