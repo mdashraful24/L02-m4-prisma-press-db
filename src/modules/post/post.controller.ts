@@ -2,6 +2,7 @@ import httpStatus from 'http-status';
 import { catchAsync } from "../../utils/catchAsync";
 import { sendResponse } from "../../utils/sendResponse";
 import { postService } from "./post.service";
+import { SelfError } from '../../utils/errorResponse';
 
 const createPost = catchAsync(async (req, res) => {
     const id = req.user?.id;
@@ -36,7 +37,20 @@ const getMyPosts = catchAsync(async (req, res) => {
 });
 
 const getSinglePost = catchAsync(async (req, res) => {
+    const postId = req.params.postId;
 
+    if (!postId) {
+        throw new SelfError("Post id required in params", httpStatus.BAD_REQUEST);
+    }
+
+    const result = await postService.getSinglePostFromDB(postId as string);
+
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: "Post fetched successfully",
+        data: result
+    });
 });
 
 const updatePost = catchAsync(async (req, res) => {

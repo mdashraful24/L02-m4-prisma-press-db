@@ -41,8 +41,32 @@ const getMyPostsFromDB = async () => {
 
 };
 
-const getSinglePostFromDB = async () => {
+const getSinglePostFromDB = async (postId: string) => {
+    const post = await prisma.post.update({
+        where: { id: postId },
+        omit: { authorId: true },
+        data: {
+            views: {
+                increment: 1
+            }
+        },
+        include: {
+            author: {
+                omit: {
+                    id: true,
+                    email: true,
+                    password: true,
+                    activeStatus: true,
+                    role: true,
+                    createdAt: true,
+                    updatedAt: true
+                }
+            },
+            comments: true
+        }
+    });
 
+    return post;
 };
 
 const updatePostIntoDB = async () => {
