@@ -1,13 +1,26 @@
-// * Enumerations for user.prisma model
+// ! Enumerations for
+
+// * User model
 enum ActiveStatus {
-    ACTIVE
-    BLOCKED
+  ACTIVE
+  BLOCKED
 }
 
 enum Role {
-    USER
-    AUTHOR
-    ADMIN
+  USER
+  AUTHOR
+  ADMIN
 }
 
-// * 
+// * Post model
+enum PostStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+// * Comment model
+enum CommentStatus {
+  APPROVED
+  REJECTED
+}

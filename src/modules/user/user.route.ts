@@ -11,4 +11,4 @@ router.get("/me", authProtected(Role.ADMIN, Role.USER), userController.getMyProf
 router.put("/my-profile", authProtected(Role.ADMIN, Role.USER), userController.updateMyProfile);
 
 
-export const userRouter = router;
+export const userRoutes = router;
