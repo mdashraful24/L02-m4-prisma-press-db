@@ -33,7 +33,16 @@ const getPostStats = catchAsync(async (req, res) => {
 });
 
 const getMyPosts = catchAsync(async (req, res) => {
+    const authorId = req.user?.id;
 
+    const result = await postService.getMyPostsFromDB(authorId as string);
+
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: "My Post retrieved successfully",
+        data: result
+    });
 });
 
 const getSinglePost = catchAsync(async (req, res) => {
@@ -48,7 +57,7 @@ const getSinglePost = catchAsync(async (req, res) => {
     sendResponse(res, {
         statusCode: httpStatus.OK,
         success: true,
-        message: "Post fetched successfully",
+        message: "Single post retrieved successfully",
         data: result
     });
 });
