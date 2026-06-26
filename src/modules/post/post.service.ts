@@ -15,7 +15,17 @@ const createPostIntoDB = async (payload: IPost, userId: string) => {
 const getPostsFromDB = async () => {
     const posts = await prisma.post.findMany({
         include: {
-            author: true,
+            author: {
+                omit: {
+                    id: true,
+                    email: true,
+                    password: true,
+                    activeStatus: true,
+                    role: true,
+                    createdAt: true,
+                    updatedAt: true
+                }
+            },
             comments: true
         }
     });
