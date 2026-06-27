@@ -2,6 +2,7 @@ import httpStatus from 'http-status';
 import { prisma } from "../../lib/prisma";
 import { SelfError } from "../../utils/errorResponse";
 import { IPost, IUpdatePostPayload } from "./post.interface";
+import { CommentStatus } from '../../../generated/prisma/enums';
 
 const createPostIntoDB = async (payload: IPost, userId: string) => {
     const post = await prisma.post.create({
@@ -64,39 +65,103 @@ const getMyPostsFromDB = async (authorId: string) => {
 };
 
 const getSinglePostFromDB = async (postId: string) => {
-    const findPost = await prisma.post.findUnique({
-        where: { id: postId }
-    });
+    // await prisma.post.update({
+    //     where: {
+    //         id: postId
+    //     },
+    //     data: {
+    //         views: {
+    //             increment: 1
+    //         }
+    //     }
+    // });
 
-    if (!findPost) {
-        throw new SelfError("Post not found", httpStatus.NOT_FOUND);
-    }
+    // const post = await prisma.post.findUniqueOrThrow({
+    //     where: {
+    //         id: postId
+    //     },
+    //     include: {
+    //         author: {
+    //             omit: {
+    //                 id: true,
+    //                 email: true,
+    //                 password: true,
+    //                 activeStatus: true,
+    //                 role: true,
+    //                 createdAt: true,
+    //                 updatedAt: true
+    //             }
+    //         },
+    //         comments: {
+    //             where: {
+    //                 status: CommentStatus.APPROVED
+    //             },
+    //             orderBy: {
+    //                 createdAt: "desc"
+    //             }
+    //         },
+    //         _count: {
+    //             select: {
+    //                 comments: true
+    //             }
+    //         }
+    //     }
+    // });
 
-    const post = await prisma.post.update({
-        where: { id: postId },
-        omit: { authorId: true },
-        data: {
-            views: {
-                increment: 1
-            }
-        },
-        include: {
-            author: {
-                omit: {
-                    id: true,
-                    email: true,
-                    password: true,
-                    activeStatus: true,
-                    role: true,
-                    createdAt: true,
-                    updatedAt: true
+    // return post;
+
+    const transactionResult = await prisma.$transaction(
+        async (tx) => {
+            await tx.post.update({
+                where: {
+                    id: postId
+                },
+                data: {
+                    views: {
+                        increment: 1
+                    }
                 }
-            },
-            comments: true
-        }
-    });
+            });
 
-    return post;
+            // throw new SelfError("Fake error");
+
+            const post = await tx.post.findUniqueOrThrow({
+                where: {
+                    id: postId
+                },
+                include: {
+                    author: {
+                        omit: {
+                            id: true,
+                            email: true,
+                            password: true,
+                            activeStatus: true,
+                            role: true,
+                            createdAt: true,
+                            updatedAt: true
+                        }
+                    },
+                    comments: {
+                        where: {
+                            status: CommentStatus.APPROVED
+                        },
+                        orderBy: {
+                            createdAt: "desc"
+                        }
+                    },
+                    _count: {
+                        select: {
+                            comments: true
+                        }
+                    }
+                }
+            });
+
+            return post;
+        }
+    );
+
+    return transactionResult;
 };
 
 const updatePostIntoDB = async (postId: string, authorId: string, isAdmin: boolean, payload: IUpdatePostPayload) => {
