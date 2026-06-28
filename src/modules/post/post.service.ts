@@ -17,26 +17,99 @@ const createPostIntoDB = async (payload: IPost, userId: string) => {
 
 const getPostsFromDB = async () => {
     const posts = await prisma.post.findMany({
+
+        // * Filtering (exact match) without AND operator
         // where: {
         //     title: "My first post",
         //     content: "100% right"
         // },
+
+
+        // * Filtering (exact match) with AND operator
+        // where: {
+        //     AND: [
+        //         {
+        //             title: "My first post"
+        //         },
+        //         {
+        //             content: "100% right"
+        //         },
+        //         {
+        //             tags: {
+        //                 equals: ["My", "first", "post"],
+        //                 has: "My"
+        //             }
+        //         }
+        //     ]
+        // },
+
+
+        // * Searching (partial match) with AND type
+        // where: {
+        //     title: {
+        //         contains: "RonAld",
+        //         mode: "insensitive"
+        //     },
+        //     content: {
+        //         contains: "Ronald",
+        //         mode: "default"
+        //     }
+        // },
+
+
+        // * Searching (partial match) with OR operator
+        // where: {
+        //     OR:[
+        //         {
+        //             title: {
+        //                 contains: "RonAld",
+        //                 mode: "insensitive"
+        //             },
+        //         },
+        //         {
+        //             content: {
+        //                 contains: "Ronald",
+        //                 mode: "insensitive"
+        //             }
+        //         }
+        //     ]
+        // },
+
+
+        // * Combining SEARCH (OR operator) and FILTERING (AND operator)
         where: {
             AND: [
                 {
-                    title: "My first post"
+                    // * Searching
+                    OR: [
+                        {
+                            title: {
+                                contains: "Ronald",
+                                mode: "insensitive"
+                            }
+                        },
+                        {
+                            content: {
+                                contains: "Ron",
+                                mode: "insensitive"
+                            }
+                        }
+                    ]
+                },
+                // * Filtering
+                {
+                    title: {
+                        contains: "Ronald"
+                    }
                 },
                 {
-                    content: "100% right"
-                },
-                {
-                    tags: {
-                        equals: ["My", "first", "post"],
-                        has: "My"
+                    content: {
+                        contains: "ronald"
                     }
                 }
             ]
         },
+
         include: {
             author: {
                 omit: {
