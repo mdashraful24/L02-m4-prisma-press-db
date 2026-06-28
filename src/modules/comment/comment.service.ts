@@ -1,7 +1,9 @@
+import httpStatus from 'http-status';
 import { prisma } from "../../lib/prisma";
-import { IComment } from "./comment.interface";
+import { SelfError } from "../../utils/errorResponse";
+import { ICommentCreate, ICommentUpdate } from "./comment.interface";
 
-const createCommentIntoDB = async (authorId: string, payload: IComment) => {
+const createCommentIntoDB = async (authorId: string, payload: ICommentCreate) => {
     await prisma.post.findUniqueOrThrow({
         where: {
             id: payload.postId
@@ -54,8 +56,21 @@ const getSingleCommentFromDB = async (commentId: string) => {
     return comment;
 };
 
-const updateCommentIntoDB = async () => {
+const updateCommentIntoDB = async (authorId: string, commentId: string, data: ICommentUpdate) => {
+    const existingComment = await prisma.comment.findFirst({
+        where: { id: commentId }
+    });
 
+    if (existingComment?.authorId !== authorId) {
+        throw new SelfError("You are not authorized to update this comment.", httpStatus.FORBIDDEN);
+    }
+
+    const comment = await prisma.comment.update({
+        where: { id: commentId },
+        data
+    });
+
+    return comment;
 };
 
 const deleteCommentFromDB = async () => {
