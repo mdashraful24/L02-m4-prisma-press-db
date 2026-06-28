@@ -38,13 +38,14 @@ const getCommentsByAuthorFromDB = async (authorId: string) => {
 };
 
 const getSingleCommentFromDB = async (commentId: string) => {
-    const comment = await prisma.comment.findUnique({
+    const comment = await prisma.comment.findUniqueOrThrow({
         where: { id: commentId },
         include: {
             post: {
                 select: {
                     id: true,
-                    title: true
+                    title: true,
+                    views: true
                 }
             }
         }
