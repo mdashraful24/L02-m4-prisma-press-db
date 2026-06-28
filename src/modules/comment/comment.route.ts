@@ -6,11 +6,11 @@ import { Role } from "../../../generated/prisma/enums";
 const router = Router();
 
 
+router.post("/", authProtected(Role.USER, Role.ADMIN), commentController.createComment);
 router.get("/author/:authorId", commentController.getCommentsByAuthor);
 router.get("/:commentId", commentController.getSingleComment);
-router.post("/", authProtected(Role.USER, Role.ADMIN, Role.AUTHOR), commentController.createComment);
-router.patch("/:commentId", authProtected(Role.USER, Role.ADMIN, Role.AUTHOR), commentController.updateComment);
-router.delete("/:commentId", authProtected(Role.USER, Role.ADMIN, Role.AUTHOR), commentController.deleteComment);
+router.patch("/:commentId", authProtected(Role.USER, Role.ADMIN), commentController.updateComment);
+router.delete("/:commentId", authProtected(Role.USER, Role.ADMIN), commentController.deleteComment);
 router.patch("/:commentId/moderate", authProtected(Role.ADMIN), commentController.moderateComment);
 
 
