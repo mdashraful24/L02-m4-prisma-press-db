@@ -57,7 +57,7 @@ const getSingleCommentFromDB = async (commentId: string) => {
 };
 
 const updateCommentIntoDB = async (authorId: string, commentId: string, data: ICommentUpdate) => {
-    const existingComment = await prisma.comment.findFirst({
+    const existingComment = await prisma.comment.findUniqueOrThrow({
         where: { id: commentId }
     });
 
@@ -73,8 +73,20 @@ const updateCommentIntoDB = async (authorId: string, commentId: string, data: IC
     return comment;
 };
 
-const deleteCommentFromDB = async () => {
+const deleteCommentFromDB = async (authorId: string, commentId: string) => {
+    const existingComment = await prisma.comment.findUniqueOrThrow({
+        where: { id: commentId }
+    });
 
+    if (existingComment?.authorId !== authorId) {
+        throw new SelfError("You are not authorized to delete this comment.", httpStatus.FORBIDDEN);
+    }
+
+    await prisma.comment.delete({
+        where: { id: commentId }
+    });
+
+    return null;
 };
 
 const moderateCommentIntoDB = async () => {
