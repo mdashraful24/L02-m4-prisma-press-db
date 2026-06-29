@@ -12,9 +12,9 @@ const registerUserIntoDB = async (payload: IUser) => {
         where: { email }
     });
 
-    if (isUserExist) {
-        throw new SelfError("User already exists with this email", httpStatus.CONFLICT);
-    }
+    // if (isUserExist) {
+    //     throw new SelfError("User already exists with this email");
+    // }
 
     const hashedPassword = await bcrypt.hash(password, Number(config.security.bcryptSaltRounds));
 

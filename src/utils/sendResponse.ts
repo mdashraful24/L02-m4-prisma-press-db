@@ -25,3 +25,24 @@ export const sendResponse = <T, E>(res: Response, resData: IResponse<T, E>) => {
         author: resData.author,
     });
 };
+
+
+// ! Experiments
+// type IResponse<T, E> = {
+//     statusCode: number;
+//     success: boolean;
+//     message?: string;
+//     data?: T;
+//     error?: E;
+//     author?: string;
+//     meta?: TMeta;
+//     name?: string;
+
+//     // Additional optional fields
+//     stack?: string;
+//     code?: string | number;
+//     details?: unknown;
+//     path?: string;
+//     method?: string;
+//     timestamp?: string;
+// };
