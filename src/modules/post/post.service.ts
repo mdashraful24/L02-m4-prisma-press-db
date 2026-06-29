@@ -3,6 +3,7 @@ import { prisma } from "../../lib/prisma";
 import { SelfError } from "../../utils/errorResponse";
 import { IPost, IPostQuery, IUpdatePostPayload } from "./post.interface";
 import { CommentStatus, PostStatus } from '../../../generated/prisma/enums';
+import { PostWhereInput } from '../../../generated/prisma/models';
 
 // ! Single Post
 const createPostIntoDB = async (payload: IPost, userId: string) => {
@@ -32,8 +33,71 @@ const getPostsFromDB = async (query: IPostQuery) => {
     const limit = query.limit ? Number(query.limit) : 10;
     const page = query.page ? Number(query.page) : 1;
     const skip = (page - 1) * limit;
+    
     const sortBy = query.sortBy ? query.sortBy : "createdAt";
     const sortOrder = query.sortOrder ? query.sortOrder : "desc";
+
+    const tags = query.tags ? JSON.parse(query.tags as string) : null;
+    const tagsArray = Array.isArray(tags) ? tags : [];
+
+    const andConditions: PostWhereInput[] = []
+
+    if (query.searchTerm) {
+        andConditions.push({
+            OR: [
+                {
+                    title: {
+                        contains: query.searchTerm,
+                        mode: "insensitive"
+                    }
+                },
+                {
+                    content: {
+                        contains: query.searchTerm,
+                        mode: "insensitive"
+                    }
+                }
+            ]
+        })
+    }
+
+    if (query.title) {
+        andConditions.push({
+            title: query.title
+        })
+    }
+
+    if (query.content) {
+        andConditions.push({
+            content: query.content
+        })
+    }
+
+    if (query.authorId) {
+        andConditions.push({
+            authorId: query.authorId
+        })
+    }
+
+    if (query.isFeatured) {
+        andConditions.push({
+            isFeatured: Boolean(query.isFeatured)
+        })
+    }
+
+    if (query.tags) {
+        andConditions.push({
+            tags: {
+                hasSome: tagsArray
+            }
+        })
+    }
+
+    if (query.status) {
+        andConditions.push({
+            status: query.status
+        })
+    }
 
     const posts = await prisma.post.findMany({
 
@@ -145,30 +209,35 @@ const getPostsFromDB = async (query: IPostQuery) => {
         //     content: "desc"
         // },
 
-        where: {
-            AND: [
-                // * Searching
-                query.searchTerm ? {
-                    OR: [
-                        {
-                            title: {
-                                contains: query.searchTerm,
-                                mode: "insensitive"
-                            }
-                        },
-                        {
-                            content: {
-                                contains: query.searchTerm,
-                                mode: "insensitive"
-                            }
-                        }
-                    ]
-                } : {},
+        // * Dynamic search, filtering, pagination, sorting
+        // where: {
+        //     AND: [
+        //         // * Searching
+        //         query.searchTerm ? {
+        //             OR: [
+        //                 {
+        //                     title: {
+        //                         contains: query.searchTerm,
+        //                         mode: "insensitive"
+        //                     }
+        //                 },
+        //                 {
+        //                     content: {
+        //                         contains: query.searchTerm,
+        //                         mode: "insensitive"
+        //                     }
+        //                 }
+        //             ]
+        //         } : {},
 
-                // * Filtering
-                query.title ? { title: query.title } : {},
-                query.content ? { content: query.content } : {}
-            ]
+        //         // * Filtering
+        //         query.title ? { title: query.title } : {},
+        //         query.content ? { content: query.content } : {}
+        //     ]
+        // },
+
+        where: {
+            AND: andConditions
         },
 
         // * Pagination
