@@ -5,7 +5,7 @@ dotenv.config({
     path: path.join(process.cwd(), ".env") // * CWD = Current Working Directory
 });
 
-const config ={
+const config = {
     databaseUrl: process.env.DATABASE_URL,
     port: process.env.PORT,
     appUrl: process.env.APP_URL,
@@ -20,6 +20,11 @@ const config ={
         accessExpiresIn: process.env.JWT_ACCESS_EXPIRES_IN!,
         refreshExpiresIn: process.env.JWT_REFRESH_EXPIRES_IN!,
     },
+
+    stripe: {
+        productKey: process.env.STRIPE_PRODUCT_ID!,
+        secretKey: process.env.STRIPE_SECRET_KEY!
+    }
 };
 
 export default config;
