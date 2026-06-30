@@ -1,0 +1,12 @@
+model Login {
+  id String @id @default(uuid())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  email   String
+  role    Role
+  loginAt DateTime @default(now())
+
+  @@map("logins")
+}
