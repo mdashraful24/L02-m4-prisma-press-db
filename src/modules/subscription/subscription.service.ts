@@ -5,7 +5,7 @@ import { stripe } from "../../lib/stripe";
 const createSubscriptionSession = async (userId: string) => {
     const transactionResult = await prisma.$transaction(
         async (tx) => {
-            const user = await prisma.user.findUniqueOrThrow({
+            const user = await tx.user.findUniqueOrThrow({
                 where: {
                     id: userId
                 },
@@ -59,4 +59,4 @@ const createSubscriptionSession = async (userId: string) => {
 
 export const subscriptionService = {
     createSubscriptionSession,
-}
+};

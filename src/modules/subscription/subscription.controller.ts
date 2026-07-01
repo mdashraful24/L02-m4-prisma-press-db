@@ -19,4 +19,4 @@ const createCheckoutSession = catchAsync(async (req, res) => {
 
 export const subscriptionController = {
     createCheckoutSession,
-}
+};
